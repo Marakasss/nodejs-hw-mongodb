@@ -9,8 +9,20 @@ import createHttpError from 'http-errors';
 
 //---------------------------------------------------------
 
+const buildContactsFilter = (query) => {
+  return {
+    type: query.type,
+  };
+};
+
 export const getContactsController = async (req, res) => {
-  const contacts = await getAllContacts();
+  const contacts = await getAllContacts({
+    page: req.validatedQuery.page,
+    perPage: req.validatedQuery.perPage,
+    sortBy: req.validatedQuery.sortBy,
+    sortOrder: req.validatedQuery.sortOrder,
+    filters: buildContactsFilter(req.validatedQuery),
+  });
 
   res.status(200).json({
     status: 200,

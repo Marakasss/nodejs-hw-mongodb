@@ -1,8 +1,59 @@
+import createHttpError from 'http-errors';
 import { contactsCollection } from '../db/models/contacts.js';
 
-export const getAllContacts = async () => {
-  const contacts = await contactsCollection.find();
-  return contacts;
+const createPaginationMetadata = (page, perPage, totalItems) => {
+  const totalPages = Math.ceil(totalItems / perPage);
+  if (page < 1 || page > totalPages) {
+    throw createHttpError(400, 'Page number out of range');
+  }
+
+  return {
+    page,
+    perPage,
+    totalItems,
+    totalPages,
+    hasPreviousPage: totalPages > 1 && page > 1,
+    hasNextPage: totalItems > page * perPage,
+  };
+};
+
+export const getAllContacts = async ({
+  page,
+  perPage,
+  sortBy,
+  sortOrder,
+  filters = {},
+}) => {
+  if (!Number.isInteger(page) || page < 1) {
+    throw createHttpError(400, 'Page must be a positive integer');
+  }
+  if (!Number.isInteger(perPage) || perPage < 1) {
+    throw createHttpError(400, 'perPage must be a positive integer');
+  }
+  const skip = (page - 1) * perPage;
+  const filtersConditions = contactsCollection.find();
+
+  if (filters.type) {
+    filtersConditions.where('contactType').equals(filters.type);
+    if ((await filtersConditions).length === 0) {
+      throw createHttpError(404, `No contacts found for type: ${filters.type}`);
+    }
+  }
+
+  const contacts = await contactsCollection
+    .find()
+    .merge(filtersConditions)
+    .limit(perPage)
+    .skip(skip)
+    .sort({ [sortBy]: sortOrder });
+  const contactsCount = await contactsCollection
+    .find()
+    .merge(filtersConditions)
+    .countDocuments();
+  return {
+    contacts,
+    ...createPaginationMetadata(page, perPage, contactsCount),
+  };
 };
 
 export const getContactByID = async (id) => {
