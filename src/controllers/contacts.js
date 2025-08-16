@@ -12,6 +12,7 @@ import createHttpError from 'http-errors';
 const buildContactsFilter = (query) => {
   return {
     type: query.type,
+    isFavourite: query.isFavourite,
   };
 };
 

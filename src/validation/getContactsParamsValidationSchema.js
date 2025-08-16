@@ -6,4 +6,5 @@ export const getContactsParamsValidationSchema = Joi.object({
   sortBy: Joi.string().valid('name').default('name'),
   sortOrder: Joi.string().valid('asc', 'desc').default('asc'),
   type: Joi.string().valid('work', 'home', 'personal'),
+  isFavourite: Joi.boolean(),
 });

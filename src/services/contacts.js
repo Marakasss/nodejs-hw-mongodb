@@ -35,9 +35,10 @@ export const getAllContacts = async ({
 
   if (filters.type) {
     filtersConditions.where('contactType').equals(filters.type);
-    if ((await filtersConditions).length === 0) {
-      throw createHttpError(404, `No contacts found for type: ${filters.type}`);
-    }
+  }
+
+  if (typeof filters.isFavourite === 'boolean') {
+    filtersConditions.where('isFavourite').equals(filters.isFavourite);
   }
 
   const contacts = await contactsCollection
@@ -50,6 +51,11 @@ export const getAllContacts = async ({
     .find()
     .merge(filtersConditions)
     .countDocuments();
+
+  if (contacts.length === 0) {
+    throw createHttpError(404, 'No contacts found for given filters');
+  }
+
   return {
     contacts,
     ...createPaginationMetadata(page, perPage, contactsCount),
