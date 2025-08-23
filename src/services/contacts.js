@@ -27,6 +27,7 @@ export const getAllContacts = async ({
   sortBy,
   sortOrder,
   filters = {},
+  userId,
 }) => {
   if (!Number.isInteger(page) || page < 1) {
     throw createHttpError(400, 'Page must be a positive integer');
@@ -46,13 +47,13 @@ export const getAllContacts = async ({
   }
 
   const contacts = await contactsCollection
-    .find()
+    .find({ userId })
     .merge(filtersConditions)
     .limit(perPage)
     .skip(skip)
     .sort({ [sortBy]: sortOrder });
   const contactsCount = await contactsCollection
-    .find()
+    .find({ userId })
     .merge(filtersConditions)
     .countDocuments();
 
@@ -68,35 +69,37 @@ export const getAllContacts = async ({
 
 //---------------------------------------------------------------------------
 
-export const getContactByID = async (id) => {
-  const contact = await contactsCollection.findById(id);
+export const getContactByID = async (id, userId) => {
+  const contact = await contactsCollection.findOne({ _id: id, userId });
   return contact;
 };
 
 //---------------------------------------------------------------------------
 
-export const createContact = async (payload) => {
-  const contact = await contactsCollection.create(payload);
+export const createContact = async (payload, userId) => {
+  const contact = await contactsCollection.create({ ...payload, userId });
   return contact;
 };
 
 //---------------------------------------------------------------------------
 
-export const deleteContactbyID = async (id) => {
-  const contact = await contactsCollection.findByIdAndDelete(id);
+export const deleteContactbyID = async (id, userId) => {
+  const contact = await contactsCollection.findOneAndDelete({
+    _id: id,
+    userId,
+  });
   return contact;
 };
 
 //---------------------------------------------------------------------------
 
-export const updateContact = async (id, payLoad, options = {}) => {
+export const updateContact = async (id, payLoad, userId, options = {}) => {
   const updatedContact = await contactsCollection.findOneAndUpdate(
-    { _id: id },
+    { _id: id, userId },
     payLoad,
     {
       new: true,
-      includeResultMetadata: true,
-      ...options,
+      upsert: options.upsert || false,
     },
   );
 
