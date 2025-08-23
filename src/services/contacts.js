@@ -1,6 +1,8 @@
 import createHttpError from 'http-errors';
 import { contactsCollection } from '../db/models/contacts.js';
 
+//---------------------------------------------------------------------------
+
 const createPaginationMetadata = (page, perPage, totalItems) => {
   const totalPages = Math.ceil(totalItems / perPage);
   if (page < 1 || page > totalPages) {
@@ -16,6 +18,8 @@ const createPaginationMetadata = (page, perPage, totalItems) => {
     hasNextPage: totalItems > page * perPage,
   };
 };
+
+//---------------------------------------------------------------------------
 
 export const getAllContacts = async ({
   page,
@@ -62,20 +66,28 @@ export const getAllContacts = async ({
   };
 };
 
+//---------------------------------------------------------------------------
+
 export const getContactByID = async (id) => {
   const contact = await contactsCollection.findById(id);
   return contact;
 };
+
+//---------------------------------------------------------------------------
 
 export const createContact = async (payload) => {
   const contact = await contactsCollection.create(payload);
   return contact;
 };
 
+//---------------------------------------------------------------------------
+
 export const deleteContactbyID = async (id) => {
   const contact = await contactsCollection.findByIdAndDelete(id);
   return contact;
 };
+
+//---------------------------------------------------------------------------
 
 export const updateContact = async (id, payLoad, options = {}) => {
   const updatedContact = await contactsCollection.findOneAndUpdate(

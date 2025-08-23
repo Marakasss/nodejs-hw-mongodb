@@ -2,9 +2,10 @@ import { getEnvVar } from './utils/getEnvVar.js';
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
-import contactsRouter from './routers/contacts.js';
+import router from './routers/index.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import cookieParser from 'cookie-parser';
 const PORT = getEnvVar('PORT', 3000);
 
 export default function setupServer() {
@@ -15,7 +16,10 @@ export default function setupServer() {
       limit: '100kb',
     }),
   );
+
   app.use(cors());
+
+  app.use(cookieParser());
 
   app.use(
     pino({
@@ -31,7 +35,7 @@ export default function setupServer() {
     });
   });
 
-  app.use(contactsRouter);
+  app.use(router);
 
   app.use(notFoundHandler);
 

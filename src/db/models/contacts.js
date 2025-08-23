@@ -1,7 +1,12 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 
 const contactSchema = new Schema(
   {
+    userId: {
+      type: Types.ObjectId,
+      ref: 'users',
+      required: true,
+    },
     name: {
       type: String,
       required: true,
