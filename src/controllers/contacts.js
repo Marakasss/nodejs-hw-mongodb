@@ -26,9 +26,13 @@ export const getContactsController = async (req, res) => {
     userId: req.user._id,
   });
 
+  const message = contacts.contacts.length
+    ? 'Successfully found contacts!'
+    : 'You don’t have any saved contacts yet.';
+
   res.status(200).json({
     status: 200,
-    message: 'Successfully found contacts!',
+    message,
     data: contacts,
   });
   return;

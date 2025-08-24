@@ -5,6 +5,18 @@ import { contactsCollection } from '../db/models/contacts.js';
 
 const createPaginationMetadata = (page, perPage, totalItems) => {
   const totalPages = Math.ceil(totalItems / perPage);
+
+  if (totalItems === 0) {
+    return {
+      page,
+      perPage,
+      totalItems,
+      totalPages: 0,
+      hasPreviousPage: false,
+      hasNextPage: false,
+    };
+  }
+
   if (page < 1 || page > totalPages) {
     throw createHttpError(400, 'Page number out of range');
   }
@@ -56,10 +68,6 @@ export const getAllContacts = async ({
     .find({ userId })
     .merge(filtersConditions)
     .countDocuments();
-
-  if (contacts.length === 0) {
-    throw createHttpError(404, 'No contacts found for given filters');
-  }
 
   return {
     contacts,
