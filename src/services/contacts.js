@@ -104,17 +104,17 @@ export const deleteContactbyID = async (id, userId) => {
 export const updateContact = async (id, payLoad, userId, options = {}) => {
   const updatedContact = await contactsCollection.findOneAndUpdate(
     { _id: id, userId },
-    payLoad,
+    { $set: payLoad },
     {
-      new: true,
+      new: true, // повертає новий документ
       upsert: options.upsert || false,
     },
   );
 
-  if (!updatedContact || !updatedContact.value) return null;
+  if (!updatedContact) return null;
 
   return {
-    contact: updatedContact.value,
-    isNew: Boolean(updatedContact.lastErrorObject.upserted),
+    contact: updatedContact,
+    isNew: options.upsert ? !updatedContact : false,
   };
 };
