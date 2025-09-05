@@ -192,7 +192,6 @@ export const loginOrSingupWithGoogle = async (code) => {
   }
 
   const newSession = createSession();
-  console.log('SESSION', newSession);
 
   return await SessionColection.create({
     userId: user._id,
