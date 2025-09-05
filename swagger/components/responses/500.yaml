@@ -1,4 +1,4 @@
-description: Bad Request
+description: Invalid request payload
 content:
   application/json:
     schema:
@@ -9,7 +9,7 @@ content:
       properties:
         status:
           type: integer
-          example: 400
+          example: 500
         message:
           type: string
-          example: Bad request. Validation failed.
+          example: Validation failed phoneNumber, contactType, name is required
